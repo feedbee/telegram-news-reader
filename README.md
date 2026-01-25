@@ -31,8 +31,8 @@ The project is being developed incrementally. Currently implemented:
 - Storing messages in MongoDB
 
 **Future phases** will add:
-- Processor component (summaries, embeddings, clustering, analytics)
-- Delivery component (web, Telegram bot, mobile app)
+- Transform component (summaries, embeddings, clustering, analytics)
+- Emit component (web, Telegram bot, mobile app)
 - Semantic and meaning-based search
 
 ## Architecture
@@ -40,8 +40,8 @@ The project is being developed incrementally. Currently implemented:
 The system consists of three logical components in a single monorepo:
 
 1. **Ingest** *(implemented)* - Loads messages from Telegram, applies filtering, stores in database
-2. **Processor** *(planned)* - Asynchronous processing, summaries, embeddings, analytics
-3. **Delivery** *(planned)* - Delivers processed content via various channels
+2. **Transform** *(planned)* - Asynchronous processing, summaries, embeddings, analytics
+3. **Emit** *(planned)* - Delivers processed content via various channels
 
 See [`docs/specification.md`](docs/specification.md) for detailed architecture.
 

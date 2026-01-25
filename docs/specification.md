@@ -95,7 +95,7 @@ This project is a **Telegram-based information ingestion and delivery platform**
 All components live in a **single monorepo**, each in its own folder.
 
 At the current stage, **only the Ingest component is implemented**.
-Processor and Delivery are defined architecturally but are **out of scope for now**.
+Transform and Emit are defined architecturally but are **out of scope for now**.
 
 **Tenant model:** This is a **single-tenant system**. One Telegram account is used for listening to channels. In the future, multiple delivery recipients may be supported, but the Telegram listener will always use a single set of credentials.
 
@@ -105,10 +105,10 @@ The system consists of three logical components:
    Responsible for loading messages from Telegram channels and groups, applying basic synchronous filtering, and storing raw data in the database.
    → See [specification-ingest.md](./specification-ingest.md) for detailed specification.
 
-2. **Processor** *(not implemented yet)*
+2. **Transform** *(not implemented yet)*
    Will be responsible for asynchronous processing of stored messages (summaries, embeddings, clustering, analytics).
 
-3. **Delivery** *(not implemented yet)*
+3. **Emit** *(not implemented yet)*
    Will be responsible for delivering processed content to users via different delivery (!= Telegram) channels (web, Telegram bot, mobile app, etc.), based on **delivery subscriptions**.
 
 ### Data Flow (three ingestion paths)
@@ -132,7 +132,7 @@ Telegram → Ingest (interval mode, batched + throttled) → Database
 * Filtering is deterministic and configurable
 * All Telegram data is preserved
 * Realtime ingestion is backed by batch recovery
-* Architecture is ready for future Processor and Delivery layers
+* Architecture is ready for future Transform and Emit layers
 
 
 ## Ingest Component
@@ -148,7 +148,7 @@ The **Ingest** component is responsible for:
 → See [specification-ingest.md](./specification-ingest.md) for detailed specification.
 
 
-## Processor Component (Future)
+## Transform Component (Future)
 
 **Not implemented yet**
 
@@ -159,10 +159,10 @@ Planned responsibilities:
 * Summaries
 * Aggregations and analytics
 
-Processor must work **asynchronously** and never block Ingest.
+Transform must work **asynchronously** and never block Ingest.
 
 
-## Delivery Component (Future)
+## Emit Component (Future)
 
 **Not implemented yet**
 
