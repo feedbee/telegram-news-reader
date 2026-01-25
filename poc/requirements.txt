@@ -1,0 +1,8 @@
+telethon
+python-dotenv
+
+chromadb==0.5.3
+sentence-transformers==3.0.1
+torch==2.2.0
+transformers==4.38.0
+anthropic==0.40.0

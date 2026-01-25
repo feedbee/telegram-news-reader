@@ -1,0 +1,37 @@
+{
+    "channels": [
+        {
+            "channel_id": "@example_channel",
+            "name": "Example Channel",
+            "is_active": true
+        },
+        {
+            "channel_id": "@another_channel",
+            "name": "Another Channel",
+            "is_active": true
+        }
+    ],
+    "filters": {
+        "string": [
+            {
+                "match": "Subscribe now",
+                "action": "remove_fragment"
+            },
+            {
+                "match": "Buy premium",
+                "action": "drop_message"
+            }
+        ],
+        "regex": [
+            {
+                "pattern": "^\\[AD\\].*",
+                "action": "drop_message"
+            },
+            {
+                "pattern": "\\s+#promo\\s+",
+                "action": "replace_fragment",
+                "replacement": " "
+            }
+        ]
+    }
+}

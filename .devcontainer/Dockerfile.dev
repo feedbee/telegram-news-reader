@@ -1,0 +1,25 @@
+FROM mcr.microsoft.com/devcontainers/python:3.12
+
+# The base image already includes:
+# - 'vscode' user (UID 1000) with sudo
+# - git, curl, build-essential
+# - Python 3.12
+
+USER vscode
+
+# Setup virtual environment as expected by devcontainer.json
+ENV VIRTUAL_ENV=/home/vscode/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Install dev tools and project dependencies
+COPY --chown=vscode:vscode ingest/requirements.txt /tmp/
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir pytest pytest-asyncio ipython && \
+    pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Environment variables for Python
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /workspace
