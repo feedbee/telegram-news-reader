@@ -8,6 +8,13 @@ from .summarizer import Summarizer
 from .config import config
 from .cli import parse_partial_datetime # Reusing for consistency
 
+import logging
+import traceback
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 app = FastAPI(title="Transform API", version="0.1.0")
 
 storage = Storage()
@@ -129,4 +136,5 @@ async def summarize(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
+        logger.exception("Internal Server Error")
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")

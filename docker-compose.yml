@@ -1,0 +1,52 @@
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  ingest:
+    build:
+      context: ./ingest
+    container_name: ingest
+    env_file: .env
+    depends_on:
+      - mongodb
+    volumes:
+      - ./session:/app/session
+      - ./config.json:/app/config.json:ro
+
+  transform:
+    build:
+      context: ./transform
+    container_name: transform
+    env_file: .env
+    depends_on:
+      - mongodb
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config.json:/app/config.json:ro
+
+  web-console:
+    build:
+      context: ./web-console
+    container_name: web-console
+    env_file: .env
+    depends_on:
+      - transform
+    ports:
+      - "80:8001"
+    environment:
+      - TRANSFORM_URL=http://transform:8000
+    volumes:
+      - ./config.json:/app/config.json:ro
+
+volumes:
+  mongodb_data:

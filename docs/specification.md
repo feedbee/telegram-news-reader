@@ -94,8 +94,8 @@ Telegram remains the raw data source. This platform becomes the **thinking and f
 This project is a **Telegram-based information ingestion and delivery platform**.
 All components live in a **single monorepo**, each in its own folder.
 
-At the current stage, **only the Ingest component is implemented**.
-Transform and Emit are defined architecturally but are **out of scope for now**.
+At the current stage, **Ingest and Transform components are implemented**.
+Web Console is under development as a standalone reading interface.
 
 **Tenant model:** This is a **single-tenant system**. One Telegram account is used for listening to channels. In the future, multiple delivery recipients may be supported, but the Telegram listener will always use a single set of credentials.
 
@@ -109,7 +109,10 @@ The system consists of three logical components:
    Will be responsible for asynchronous processing of stored messages (summaries, embeddings, clustering, analytics).
 
 3. **Emit** *(not implemented yet)*
-   Will be responsible for delivering processed content to users via different delivery (!= Telegram) channels (web, Telegram bot, mobile app, etc.), based on **delivery subscriptions**.
+   Will be responsible for push-based delivery of processed content to users (e.g., Telegram bot notifications, emails).
+
+4. **Web Console** *(under development)*
+   A pull-based web interface for on-demand reading of summaries and structured content.
 
 ### Data Flow (three ingestion paths)
 
@@ -148,29 +151,39 @@ The **Ingest** component is responsible for:
 → See [specification-ingest.md](./specification-ingest.md) for detailed specification.
 
 
-## Transform Component (Future)
+## Transform Component
 
-**Not implemented yet**
+**Implemented**
 
-Planned responsibilities:
+Responsible for:
+* Summaries (Claude-based)
+* Storage interaction for historical data
+* Metadata reporting
 
-* Embeddings generation
-* Clustering
-* Summaries
-* Aggregations and analytics
-
-Transform must work **asynchronously** and never block Ingest.
+→ See [specification-transform.md](./specification-transform.md) for detailed specification.
 
 
 ## Emit Component (Future)
 
 **Not implemented yet**
 
-Planned responsibilities:
+Responsible for **push-based** delivery:
+* Telegram bot notifications
+* Mobile app push notifications
+* Email digests
+* Based on delivery subscriptions
 
-* Deliver processed content to users
-* Channels: web, Telegram bot, mobile app, etc.
-* Subscriptions are based on **delivery channels**, not Telegram channels
+
+## Web Console
+
+**Under development**
+
+Responsible for **pull-based** on-demand reading:
+* Delivering processed content via a web interface
+* Converting Markdown summaries to HTML for premium reading
+* User-side state management (Last Message ID)
+
+→ See [specification-web-console.md](./specification-web-console.md) for detailed specification.
 
 
 ## Technical Stack
