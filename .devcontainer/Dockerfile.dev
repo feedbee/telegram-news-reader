@@ -5,9 +5,10 @@ FROM mcr.microsoft.com/devcontainers/python:3.12
 # - git, curl, build-essential
 # - Python 3.12
 
+# node and npm (LTS) are installed as a .devcontainer feature
+
 USER root
 RUN apt-get update && \
-    apt-get install -y nodejs npm && \
     rm -rf /var/lib/apt/lists/*
 
 USER vscode
@@ -18,15 +19,18 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install dev tools and project dependencies
-COPY --chown=vscode:vscode ingest/requirements.txt /tmp/ingest-requirements.txt
-COPY --chown=vscode:vscode transform/requirements.txt /tmp/transform-requirements.txt
-COPY --chown=vscode:vscode web-console/backend/requirements.txt /tmp/web-console-requirements.txt
+COPY --chown=vscode:vscode ingest/requirements*.txt /tmp/ingest/
+COPY --chown=vscode:vscode transform/requirements*.txt /tmp/transform/
+COPY --chown=vscode:vscode web-console/backend/requirements*.txt /tmp/web-console/
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir pytest pytest-asyncio pytest-mock ipython httpx && \
-    pip install --no-cache-dir -r /tmp/ingest-requirements.txt && \
-    pip install --no-cache-dir -r /tmp/transform-requirements.txt && \
-    pip install --no-cache-dir -r /tmp/web-console-requirements.txt
+    pip install --no-cache-dir ipython ruff black && \
+    pip install --no-cache-dir -r /tmp/ingest/requirements.txt && \
+    pip install --no-cache-dir -r /tmp/ingest/requirements-test.txt && \
+    pip install --no-cache-dir -r /tmp/transform/requirements.txt && \
+    pip install --no-cache-dir -r /tmp/transform/requirements-test.txt && \
+    pip install --no-cache-dir -r /tmp/web-console/requirements.txt && \
+    pip install --no-cache-dir -r /tmp/web-console/requirements-test.txt
 
 # Environment variables for Python
 ENV PYTHONUNBUFFERED=1 \
