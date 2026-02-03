@@ -3,10 +3,13 @@ import os
 import json
 import logging
 import httpx
-from fastapi import FastAPI, Request, Response, HTTPException
+from fastapi import FastAPI, Request, Response, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import List, Optional
+import base64
+from auth import get_current_user
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -28,7 +31,7 @@ CONFIG_PATH = os.getenv("CONFIG_PATH", "config.json")
 
 # 1. API - List Channels
 @app.get("/api/channels")
-async def get_channels():
+async def get_channels(user: dict = Depends(get_current_user)):
     if not os.path.exists(CONFIG_PATH):
         raise HTTPException(status_code=404, detail="Config file not found")
     
@@ -44,7 +47,7 @@ async def get_channels():
 
 # 2. API - Proxy to Transform Summarize
 @app.get("/api/summarize")
-async def proxy_summarize(request: Request):
+async def proxy_summarize(request: Request, user: dict = Depends(get_current_user)):
     params = request.query_params
     url = f"{TRANSFORM_URL}/summarize"
     

@@ -4,7 +4,36 @@ import ReactMarkdown from 'react-markdown';
 import { Loader2, Send, Save, RefreshCw, Hash, Calendar, Layers, ExternalLink } from 'lucide-react';
 import './App.css';
 
-const App = () => {
+const Login = () => {
+    const { login } = useAuth();
+    const [error, setError] = useState('');
+
+    const handleLogin = async () => {
+        try {
+            setError('');
+            await login();
+        } catch (err) {
+            setError('Failed to sign in. Please try again.');
+            console.error(err);
+        }
+    };
+
+    return (
+        <div className="login-container">
+            <div className="card glass-card login-card">
+                <h1>News Reader Console</h1>
+                <p>Please sign in to access the console.</p>
+                {error && <p className="error-text">{error}</p>}
+                <button className="primary-button" onClick={handleLogin}>
+                    Sign in with Google
+                </button>
+            </div>
+        </div>
+    );
+};
+
+const Console = () => {
+    const { logout, currentUser, getToken } = useAuth();
     const [channels, setChannels] = useState([]);
     const [selectedChannel, setSelectedChannel] = useState('');
     const [lastMessageId, setLastMessageId] = useState(() => {
@@ -19,7 +48,12 @@ const App = () => {
     useEffect(() => {
         const fetchChannels = async () => {
             try {
-                const res = await fetch('/api/channels');
+                const token = await getToken();
+                const res = await fetch('/api/channels', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 if (!res.ok) throw new Error('Failed to fetch channels');
                 const data = await res.json();
                 setChannels(data);
@@ -54,7 +88,12 @@ const App = () => {
             });
             if (lastMessageId) params.append('last_message_id', lastMessageId);
 
-            const res = await fetch(`/api/summarize?${params.toString()}`);
+            const token = await getToken();
+            const res = await fetch(`/api/summarize?${params.toString()}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             if (!res.ok) throw new Error('Failed to generate summary');
 
             // Get Metadata from Headers
@@ -85,9 +124,9 @@ const App = () => {
             <header className="glass-header">
                 <div className="header-content">
                     <h1>News Reader <span className="highlight">Console</span></h1>
-                    <div className="status-badge">
-                        <div className="pulse-dot"></div>
-                        Sync Active
+                    <div className="user-info">
+                        <span className="user-email">{currentUser?.email}</span>
+                        <button className="secondary-button small" onClick={logout}>Logout</button>
                     </div>
                 </div>
             </header>
@@ -207,6 +246,21 @@ const App = () => {
                 <p>© 2026 Telegram News Reader Platform</p>
             </footer>
         </div>
+    );
+};
+
+import { AuthProvider, useAuth } from './AuthContext';
+
+const AppContent = () => {
+    const { currentUser } = useAuth();
+    return currentUser ? <Console /> : <Login />;
+};
+
+const App = () => {
+    return (
+        <AuthProvider>
+            <AppContent />
+        </AuthProvider>
     );
 };
 

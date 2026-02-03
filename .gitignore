@@ -44,6 +44,7 @@ Thumbs.db
 # Environment and secrets
 .env
 *.session
+firebase-service-account.json
 
 # Project specific
 config.json
