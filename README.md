@@ -117,8 +117,7 @@ npm run dev --prefix web-console/frontend
 Or:
 
 ```bash
-source .env
-concurrently "make console-backend" "make console-frontend" "make transform-run" "make ingest-run"
+set -a; source .env; set +a; concurrently "make console-backend" "make console-frontend" "make transform-run" "make ingest-run"
 ```
 
 ## Documentation

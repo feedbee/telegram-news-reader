@@ -99,3 +99,11 @@ console-build-multiplatform: ## Build multi-platform web-console image
 console-push-multiplatform: ## Authenticate and push multi-platform web-console image
 	docker login
 	$(BUILDX_CONSOLE_CMD) --push
+
+# ==============================================================================
+# Full Stack
+# ==============================================================================
+
+full-stack: ## Run all components locally
+	set -a; source .env; set +a; concurrently "make console-backend" "make console-frontend" "make transform-run" "make ingest-run"
+
