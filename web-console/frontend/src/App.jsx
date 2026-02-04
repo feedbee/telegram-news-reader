@@ -42,28 +42,42 @@ const Console = () => {
     const [loading, setLoading] = useState(false);
     const [summary, setSummary] = useState('');
     const [metadata, setMetadata] = useState(null);
+    const [userMetadata, setUserMetadata] = useState(null);
     const [error, setError] = useState('');
 
     // 1. Fetch Channels
+    // 1. Sync User & Fetch Channels
     useEffect(() => {
-        const fetchChannels = async () => {
+        const init = async () => {
+            if (!currentUser) return;
             try {
                 const token = await getToken();
+
+                // A. Sync User
+                const syncRes = await fetch('/api/users/sync', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (syncRes.ok) {
+                    const syncData = await syncRes.json();
+                    setUserMetadata(syncData.metadata);
+                }
+
+                // B. Fetch Channels
                 const res = await fetch('/api/channels', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!res.ok) throw new Error('Failed to fetch channels');
                 const data = await res.json();
                 setChannels(data);
                 if (data.length > 0) setSelectedChannel(data[0].channel_id);
             } catch (err) {
+                console.error(err);
                 setError('Could not connect to the backend service.');
             }
         };
-        fetchChannels();
-    }, []);
+        init();
+    }, [currentUser]);
 
     // 2. Persist Last Message ID
     useEffect(() => {
@@ -140,7 +154,16 @@ const Console = () => {
                             <label>Select Channel</label>
                             <select
                                 value={selectedChannel}
-                                onChange={(e) => setSelectedChannel(e.target.value)}
+                                onChange={(e) => {
+                                    const newChannel = e.target.value;
+                                    setSelectedChannel(newChannel);
+                                    // Pre-fill last message ID from user metadata if available
+                                    if (userMetadata?.last_message_ids && userMetadata.last_message_ids[newChannel]) {
+                                        setLastMessageId(String(userMetadata.last_message_ids[newChannel]));
+                                    } else {
+                                        setLastMessageId('');
+                                    }
+                                }}
                                 disabled={loading}
                             >
                                 {channels.map(ch => (

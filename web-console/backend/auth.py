@@ -38,9 +38,16 @@ async def get_current_user(auth_creds: HTTPAuthorizationCredentials = Depends(se
         
         user_id = decoded_token.get("uid")
         email = decoded_token.get("email")
+        name = decoded_token.get("name")
+        picture = decoded_token.get("picture")
         
         logger.info(f"Authenticated user: {email} ({user_id})")
-        return {"uid": user_id, "email": email}
+        return {
+            "uid": user_id, 
+            "email": email,
+            "display_name": name,
+            "photo_url": picture
+        }
         
     except auth.ExpiredIdTokenError:
         raise HTTPException(status_code=401, detail="Token expired")
