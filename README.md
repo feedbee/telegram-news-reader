@@ -126,6 +126,7 @@ set -a; source .env; set +a; concurrently "make console-backend" "make console-f
 - [`docs/specification-ingest.md`](docs/specification-ingest.md) - Ingest details
 - [`docs/specification-transform.md`](docs/specification-transform.md) - AI Transform details
 - [`docs/specification-web-console.md`](docs/specification-web-console.md) - Web UI details
+- [`docs/specification-users.md`](docs/specification-users.md) - Users details
 
 ## Project Structure
 
@@ -141,4 +142,4 @@ telegram-news-reader/
 
 ## License
 
-[Add your license here]
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
