@@ -36,9 +36,7 @@ const Console = () => {
     const { logout, currentUser, getToken } = useAuth();
     const [channels, setChannels] = useState([]);
     const [selectedChannel, setSelectedChannel] = useState('');
-    const [lastMessageId, setLastMessageId] = useState(() => {
-        return localStorage.getItem('last_message_id') || '';
-    });
+    const [lastMessageId, setLastMessageId] = useState('');
     const [loading, setLoading] = useState(false);
     const [summary, setSummary] = useState('');
     const [metadata, setMetadata] = useState(null);
@@ -58,8 +56,9 @@ const Console = () => {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+                let syncData = null;
                 if (syncRes.ok) {
-                    const syncData = await syncRes.json();
+                    syncData = await syncRes.json();
                     setUserMetadata(syncData.metadata);
                 }
 
@@ -70,7 +69,16 @@ const Console = () => {
                 if (!res.ok) throw new Error('Failed to fetch channels');
                 const data = await res.json();
                 setChannels(data);
-                if (data.length > 0) setSelectedChannel(data[0].channel_id);
+
+                if (data.length > 0) {
+                    const firstChannel = data[0].channel_id;
+                    setSelectedChannel(firstChannel);
+
+                    // Pre-fill last message ID from synced metadata if available
+                    if (syncData?.metadata?.last_message_ids?.[firstChannel]) {
+                        setLastMessageId(String(syncData.metadata.last_message_ids[firstChannel]));
+                    }
+                }
             } catch (err) {
                 console.error(err);
                 setError('Could not connect to the backend service.');
@@ -79,14 +87,8 @@ const Console = () => {
         init();
     }, [currentUser]);
 
-    // 2. Persist Last Message ID
-    useEffect(() => {
-        if (lastMessageId) {
-            localStorage.setItem('last_message_id', lastMessageId);
-        }
-    }, [lastMessageId]);
 
-    // 3. Handle Summarize
+    // 2. Handle Summarize
     const handleSummarize = async () => {
         if (!selectedChannel) return;
 
@@ -122,6 +124,14 @@ const Console = () => {
             // Final fallback for last message ID if processed > 0
             if (meta.lastId && meta.lastId !== 'N/A') {
                 setLastMessageId(meta.lastId);
+                // Update local userMetadata to keep it in sync without re-fetching
+                setUserMetadata(prev => ({
+                    ...prev,
+                    last_message_ids: {
+                        ...(prev?.last_message_ids || {}),
+                        [selectedChannel]: parseInt(meta.lastId)
+                    }
+                }));
             }
 
             const text = await res.text();
