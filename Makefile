@@ -1,3 +1,9 @@
+# Load environment variables from .env file
+ifneq (,$(wildcard ./.env))
+    include .env
+    export
+endif
+
 # Default variables
 DOCKER_USER ?= feedbee
 GIT_HASH := $(shell git rev-parse --short HEAD)
@@ -105,5 +111,5 @@ console-push-multiplatform: ## Authenticate and push multi-platform web-console 
 # ==============================================================================
 
 full-stack: ## Run all components locally
-	set -a; source .env; set +a; concurrently "make console-backend" "make console-frontend" "make transform-run" "make ingest-run"
+	concurrently "make console-backend" "make console-frontend" "make transform-run" "make ingest-run"
 
