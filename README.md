@@ -93,7 +93,7 @@ MONGODB_URI=mongodb://admin:password@mongodb:27017/telegram-news-reader?authSour
 CONFIG_PATH=config.json
 ```
 
-### Development Commands
+## Development Commands
 
 For local development within the Dev Container:
 
@@ -119,6 +119,41 @@ Or:
 ```bash
 set -a; source .env; set +a; concurrently "make console-backend" "make console-frontend" "make transform-run" "make ingest-run"
 ```
+
+
+## CI/CD
+
+The project includes a GitHub Actions workflow for building and pushing Docker images to Docker Hub.
+
+### Build Workflow
+
+The workflow (`.github/workflows/build.yml`) supports:
+- **Manual triggering** via GitHub UI or CLI
+- **Component selection** (build ingest, transform, web-console, or all)
+- **Multi-platform builds** (linux/amd64, linux/arm64)
+- **Automated tagging** with `latest` and git hash tags
+
+### Setup Required
+
+1. Add GitHub repository secrets:
+   - `DOCKERHUB_USERNAME` - Your Docker Hub username
+   - `DOCKERHUB_TOKEN` - Docker Hub access token
+
+2. Trigger builds:
+   ```bash
+   # Via GitHub CLI
+   gh workflow run build.yml -f component=all
+   gh workflow run build.yml -f component=ingest
+   gh workflow run build.yml -f component=transform
+   gh workflow run build.yml -f component=web-console
+
+   
+   # Via GitHub UI
+   # Go to Actions → Build and Push Docker Images → Run workflow
+   ```
+
+The workflow is designed to easily support tag-based or branch-based automation. See the walkthrough artifact for examples.
+
 
 ## Documentation
 
