@@ -8,11 +8,25 @@ endif
 DOCKER_USER ?= feedbee
 GIT_HASH := $(shell git rev-parse --short HEAD)
 
+# Multi-platform settings
+PLATFORMS ?= linux/amd64,linux/arm64
+
+# Detect local architecture for --load (buildx requires a single platform for --load)
+UNAME_M := $(shell uname -m)
+ifeq ($(UNAME_M),x86_64)
+    LOCAL_PLATFORM := linux/amd64
+else ifeq ($(UNAME_M),aarch64)
+    LOCAL_PLATFORM := linux/arm64
+else ifeq ($(UNAME_M),arm64)
+    LOCAL_PLATFORM := linux/arm64
+else
+    LOCAL_PLATFORM := linux/amd64
+endif
+
 # Ingest Multi-platform build command
 INGEST_REPO_NAME ?= telegram-news-reader-ingest
 INGEST_REPO_URL := $(DOCKER_USER)/$(INGEST_REPO_NAME)
 BUILDX_INGEST_CMD := docker buildx build \
-	--platform linux/amd64,linux/arm64 \
 	-t $(INGEST_REPO_URL):latest \
 	-t $(INGEST_REPO_URL):$(GIT_HASH) \
 	-f ingest/Dockerfile \
@@ -22,17 +36,15 @@ BUILDX_INGEST_CMD := docker buildx build \
 TRANSFORM_REPO_NAME ?= telegram-news-reader-transform
 TRANSFORM_REPO_URL := $(DOCKER_USER)/$(TRANSFORM_REPO_NAME)
 BUILDX_TRANSFORM_CMD := docker buildx build \
-	--platform linux/amd64,linux/arm64 \
 	-t $(TRANSFORM_REPO_URL):latest \
 	-t $(TRANSFORM_REPO_URL):$(GIT_HASH) \
 	-f transform/Dockerfile \
 	transform/
 
 # Web Console Multi-platform build command
-CONSOLE_REPO_NAME ?= telegram-news-reader-console
+CONSOLE_REPO_NAME ?= telegram-news-reader-web-console
 CONSOLE_REPO_URL := $(DOCKER_USER)/$(CONSOLE_REPO_NAME)
 BUILDX_CONSOLE_CMD := docker buildx build \
-	--platform linux/amd64,linux/arm64 \
 	-t $(CONSOLE_REPO_URL):latest \
 	-t $(CONSOLE_REPO_URL):$(GIT_HASH) \
 	-f web-console/Dockerfile \
@@ -59,12 +71,12 @@ ingest-run: ## Run ingest in realtime mode with catch-up
 ingest-build: ## Build the Docker image locally (current architecture)
 	docker build -t $(INGEST_REPO_URL) -f ingest/Dockerfile ingest/
 
-ingest-build-multiplatform: ## Build multi-platform image (dry run, using cache)
-	$(BUILDX_INGEST_CMD)
+ingest-build-multiplatform: ## Build with buildx for local architecture and load into local docker
+	$(BUILDX_INGEST_CMD) --platform $(LOCAL_PLATFORM) --load
 
 ingest-push-multiplatform: ## Authenticate and push multi-platform ingest image
 	docker login
-	$(BUILDX_INGEST_CMD) --push
+	$(BUILDX_INGEST_CMD) --platform $(PLATFORMS) --push
 
 # ==============================================================================
 # Transform Component
@@ -79,12 +91,12 @@ transform-run: ## Run transform API server
 transform-build: ## Build the transform Docker image locally
 	docker build -t $(TRANSFORM_REPO_URL) -f transform/Dockerfile transform/
 
-transform-build-multiplatform: ## Build multi-platform transform image
-	$(BUILDX_TRANSFORM_CMD)
+transform-build-multiplatform: ## Build with buildx for local architecture and load into local docker
+	$(BUILDX_TRANSFORM_CMD) --platform $(LOCAL_PLATFORM) --load
 
 transform-push-multiplatform: ## Authenticate and push multi-platform transform image
 	docker login
-	$(BUILDX_TRANSFORM_CMD) --push
+	$(BUILDX_TRANSFORM_CMD) --platform $(PLATFORMS) --push
 
 # ==============================================================================
 # Web Console Component
@@ -99,12 +111,12 @@ console-backend: ## Run backend proxy
 console-build: ## Build the web-console Docker image locally
 	docker build -t $(CONSOLE_REPO_URL) -f web-console/Dockerfile web-console/
 
-console-build-multiplatform: ## Build multi-platform web-console image
-	$(BUILDX_CONSOLE_CMD)
+console-build-multiplatform: ## Build with buildx for local architecture and load into local docker
+	$(BUILDX_CONSOLE_CMD) --platform $(LOCAL_PLATFORM) --load
 
 console-push-multiplatform: ## Authenticate and push multi-platform web-console image
 	docker login
-	$(BUILDX_CONSOLE_CMD) --push
+	$(BUILDX_CONSOLE_CMD) --platform $(PLATFORMS) --push
 
 # ==============================================================================
 # Full Stack

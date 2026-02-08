@@ -30,6 +30,27 @@ app.add_middleware(
 TRANSFORM_URL = os.getenv("TRANSFORM_URL", "http://transform:8000")
 CONFIG_PATH = os.getenv("CONFIG_PATH", "config.json")
 
+# Firebase Config (for frontend)
+# Supports both FIREBASE_* (preferred for prod) and VITE_FIREBASE_* (fallback for local dev compat)
+FIREBASE_CONFIG = {
+    "apiKey": os.getenv("FIREBASE_API_KEY") or os.getenv("VITE_FIREBASE_API_KEY", ""),
+    "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN") or os.getenv("VITE_FIREBASE_AUTH_DOMAIN", ""),
+    "projectId": os.getenv("FIREBASE_PROJECT_ID") or os.getenv("VITE_FIREBASE_PROJECT_ID", ""),
+    "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET") or os.getenv("VITE_FIREBASE_STORAGE_BUCKET", ""),
+    "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID") or os.getenv("VITE_FIREBASE_MESSAGING_SENDER_ID", ""),
+    "appId": os.getenv("FIREBASE_APP_ID") or os.getenv("VITE_FIREBASE_APP_ID", ""),
+}
+
+@app.get("/config.js")
+async def get_config_js():
+    """
+    Serves environment variables as a JS file to be loaded by the frontend.
+    This allows runtime configuration of the frontend in Docker.
+    """
+    config_json = json.dumps(FIREBASE_CONFIG)
+    content = f"window.FIREBASE_CONFIG = {config_json};"
+    return Response(content=content, media_type="application/javascript")
+
 # Initialize Storage
 storage = Storage()
 
@@ -96,7 +117,7 @@ async def proxy_summarize(request: Request, user: dict = Depends(get_current_use
                 media_type=response.headers.get("content-type")
             )
         except Exception as e:
-            logger.exception("Proxy error")
+            logger.exception(f"Error connecting to Transform service at {url}")
             raise HTTPException(status_code=500, detail=f"Error connecting to Transform service: {e}")
 
 # 3. Health Check
@@ -104,15 +125,7 @@ async def proxy_summarize(request: Request, user: dict = Depends(get_current_use
 async def health():
     return {"status": "ok"}
 
-# 4. Static Files (Frontend build)
-# This should be at the end to not catch API routes
-FRONTEND_BUILD_DIR = "static"
-if os.path.exists(FRONTEND_BUILD_DIR):
-    app.mount("/", StaticFiles(directory=FRONTEND_BUILD_DIR, html=True), name="static")
-else:
-    logger.warning(f"Frontend build directory '{FRONTEND_BUILD_DIR}' not found. Serving API only.")
-
-# 5. User Sync Endpoint
+# 4. User Sync Endpoint
 @app.post("/api/users/sync")
 async def sync_user(user: dict = Depends(get_current_user)):
     """
@@ -128,6 +141,14 @@ async def sync_user(user: dict = Depends(get_current_user)):
     except Exception as e:
         logger.error(f"Error syncing user: {e}")
         raise HTTPException(status_code=500, detail="Failed to sync user")
+
+# 5. Static Files (Frontend build)
+# This should be at the end to not catch API routes
+FRONTEND_BUILD_DIR = "static"
+if os.path.exists(FRONTEND_BUILD_DIR):
+    app.mount("/", StaticFiles(directory=FRONTEND_BUILD_DIR, html=True), name="static")
+else:
+    logger.warning(f"Frontend build directory '{FRONTEND_BUILD_DIR}' not found. Serving API only.")
 
 if __name__ == "__main__":
     import uvicorn
