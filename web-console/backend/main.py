@@ -5,7 +5,6 @@ import logging
 import httpx
 from fastapi import FastAPI, Request, Response, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import List, Optional
 import base64
@@ -17,15 +16,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Web Console API Gateway")
-
-# Allow CORS for development (local react dev server)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 TRANSFORM_URL = os.getenv("TRANSFORM_URL", "http://transform:8000")
 CONFIG_PATH = os.getenv("CONFIG_PATH", "config.json")
