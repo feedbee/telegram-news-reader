@@ -5,9 +5,8 @@ import logging
 import httpx
 from fastapi import FastAPI, Request, Response, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import List, Optional
-import base64
+
 from auth import get_current_user
 from storage import Storage
 
