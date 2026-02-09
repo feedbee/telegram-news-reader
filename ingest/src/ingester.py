@@ -123,7 +123,7 @@ class Ingester:
             print(f"Message {event.message.id} edited in {channel_id}")
             await self._process_message(event.message, channel_id)
 
-        @self.client.on(events.MessageDeleted())
+        @self.client.on(events.MessageDeleted(chats=channel_ids))
         async def message_deleted_handler(event):
             # MessageDeleted event contains deleted_ids and chat information
             # We need to get the chat from the event's input_chat or chat_id
