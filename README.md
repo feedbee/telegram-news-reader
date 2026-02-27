@@ -120,6 +120,20 @@ Or:
 set -a; source .env; set +a; concurrently "make console-backend" "make console-frontend" "make transform-run" "make ingest-run"
 ```
 
+## Data Migrations
+
+Date migration #001 converts message dates from ISO strings to MongoDB Date.
+
+```bash
+# Dry run
+docker compose run --rm --no-deps ingest \
+  python migrations/001_migrate_message_dates.py --dry-run
+
+# Apply migration
+docker compose run --rm --no-deps ingest \
+  python migrations/001_migrate_message_dates.py
+```
+
 
 ## CI/CD
 

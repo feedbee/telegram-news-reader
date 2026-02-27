@@ -2,7 +2,7 @@
 import asyncio
 import time
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any
 
 class Throttler:
@@ -40,10 +40,18 @@ def serialize_message(message, user_cache=None) -> Dict[str, Any]:
     tailored for what we actually need to store, but keeping it extensible.
     """
     # Basic fields
+    msg_date = message.date
+    if msg_date and msg_date.tzinfo is None:
+        msg_date = msg_date.replace(tzinfo=timezone.utc)
+
+    edit_date = message.edit_date
+    if edit_date and edit_date.tzinfo is None:
+        edit_date = edit_date.replace(tzinfo=timezone.utc)
+
     data = {
         "message_id": message.id,
-        "date": message.date.isoformat() if message.date else None,
-        "edit_date": message.edit_date.isoformat() if message.edit_date else None,
+        "date": msg_date,
+        "edit_date": edit_date,
         "text": message.text,
         "raw_text": message.raw_text,
         "views": getattr(message, "views", None),

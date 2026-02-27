@@ -17,7 +17,7 @@ class Storage:
         Results are limited to `limit` messages (newest first within the range, or logical order).
         Typically we want chronological order for summarization.
         """
-        # Ensure dates are timezone aware (UTC) and formatted as ISO strings
+        # Ensure dates are timezone aware (UTC)
         if from_date.tzinfo is None:
             from_date = from_date.replace(tzinfo=timezone.utc)
         if to_date.tzinfo is None:
@@ -26,12 +26,10 @@ class Storage:
         # Basic query
         query = {"channel_id": channel_id}
         
-        # Add date range filter
-        # Dates are stored as ISO strings in the DB (e.g. "2026-01-24T11:20:13+00:00")
-        # String comparison works for ISO dates (lexicographical order matches chronological)
+        # Add date range filter (MongoDB Date)
         query["date"] = {
-            "$gte": from_date.isoformat(),
-            "$lte": to_date.isoformat()
+            "$gte": from_date,
+            "$lte": to_date
         }
         
         # We fetch chronological order for better summarization flow
@@ -54,7 +52,7 @@ class Storage:
         """
         Count total messages in interval without fetching them.
         """
-        # Ensure dates are timezone aware (UTC) and formatted as ISO strings
+        # Ensure dates are timezone aware (UTC)
         if from_date.tzinfo is None:
             from_date = from_date.replace(tzinfo=timezone.utc)
         if to_date.tzinfo is None:
@@ -63,8 +61,8 @@ class Storage:
         query = {
             "channel_id": channel_id,
             "date": {
-                "$gte": from_date.isoformat(), 
-                "$lte": to_date.isoformat()
+                "$gte": from_date,
+                "$lte": to_date
             }
         }
         return self.messages_collection.count_documents(query)
