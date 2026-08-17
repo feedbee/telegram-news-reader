@@ -13,7 +13,7 @@ class Config:
     
     # Anthropic
     anthropic_api_key: Optional[str] = os.getenv("ANTHROPIC_API_KEY")
-    claude_model: str = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-20250514")
+    claude_model: str = os.getenv("CLAUDE_MODEL", "claude-sonnet-5")
     max_tokens: int = int(os.getenv("MAX_TOKENS", "4000"))
     
     # Summarization Defaults

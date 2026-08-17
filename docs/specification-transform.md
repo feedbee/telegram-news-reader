@@ -100,7 +100,7 @@ Configuration is managed via environment variables (shared `.env` file):
 
 * `MONGODB_URI`: Connection string for message storage.
 * `ANTHROPIC_API_KEY`: API key for Claude.
-* `CLAUDE_MODEL`: Model version (default: `claude-sonnet-4-20250514`).
+* `CLAUDE_MODEL`: Model version (default: `claude-sonnet-5`).
 * `MAX_TOKENS`: Max generation tokens (default: `4000`).
 
 ## Deployment

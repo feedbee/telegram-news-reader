@@ -48,6 +48,22 @@ def test_summarize_success(mock_config, mock_anthropic):
     assert call_kwargs["model"] == "claude-fake"
     assert "Msg 1" in call_kwargs["messages"][0]["content"]
 
+def test_summarize_skips_non_text_content_blocks(mock_config, mock_anthropic):
+    summarizer = Summarizer()
+
+    mock_response = MagicMock()
+    mock_response.content = [
+        MagicMock(type="thinking", text=None),
+        MagicMock(type="text", text="  Summary text  "),
+    ]
+    mock_anthropic.messages.create.return_value = mock_response
+
+    result = summarizer.summarize([
+        {"date": "2024-01-01", "cleaned_text": "Msg 1"}
+    ])
+
+    assert result == "Summary text"
+
 @pytest.fixture
 def mock_mongo():
     with patch('src.storage.MongoClient') as MockClient:

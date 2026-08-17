@@ -74,7 +74,16 @@ class Summarizer:
                 ]
             )
             
-            return response.content[0].text.strip()
+            text_blocks = [
+                block.text.strip()
+                for block in response.content
+                if isinstance(getattr(block, "text", None), str)
+                and block.text.strip()
+            ]
+            if not text_blocks:
+                raise ValueError("Claude response contained no text blocks")
+
+            return "\n\n".join(text_blocks)
 
         except APIError as e:
             logger.error(f"Anthropic API Error: {e}")
