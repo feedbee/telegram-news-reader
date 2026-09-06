@@ -53,7 +53,7 @@ BUILDX_CONSOLE_CMD := docker buildx build \
 .PHONY: help \
 	ingest-test ingest-run ingest-build ingest-build-multiplatform ingest-push-multiplatform \
 	transform-test transform-run transform-build transform-build-multiplatform transform-push-multiplatform \
-	console-frontend console-backend console-build console-build-multiplatform console-push-multiplatform
+	console-test console-frontend console-backend console-build console-build-multiplatform console-push-multiplatform
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -102,6 +102,9 @@ transform-push-multiplatform: ## Authenticate and push multi-platform transform 
 # Web Console Component
 # ==============================================================================
 
+console-test: ## Run web-console backend tests locally
+	cd web-console/backend && pip install -r requirements.txt -r requirements-test.txt && PYTHONPATH=. pytest tests/
+
 console-frontend: ## Run frontend dev server
 	npm run dev --prefix web-console/frontend
 
@@ -124,4 +127,3 @@ console-push-multiplatform: ## Authenticate and push multi-platform web-console 
 
 full-stack: ## Run all components locally
 	concurrently "make console-backend" "make console-frontend" "make transform-run" "make ingest-run"
-

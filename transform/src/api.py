@@ -45,7 +45,7 @@ async def summarize(
     from_date: Optional[str] = Query(None, alias="from", description="Start date (flexible format)"),
     to_date: Optional[str] = Query(None, alias="to", description="End date (flexible format)"),
     last_message_id: Optional[int] = Query(None, alias="last_message_id", description="Start after this message ID"),
-    format: str = Query("MD", regex="^(MD|JSON)$", description="Output format: MD or JSON")
+    format: str = Query("MD", pattern="^(MD|JSON)$", description="Output format: MD or JSON")
 ):
     try:
         # Determine filters

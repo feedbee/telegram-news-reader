@@ -31,7 +31,7 @@ For local development, you should run the backend and frontend separately.
 
 ### 1. Prerequisites
 - Python 3.12+
-- Node.js 20+
+- Node.js 24 LTS recommended (Vite requires 20.19+ or 22.12+)
 
 ### 2. Backend Setup
 The backend proxies requests to the Transform service and serves the frontend.
@@ -50,10 +50,18 @@ The frontend uses Vite for development.
 
 ```bash
 cd web-console/frontend
-npm install
+npm ci
 npm run dev
 ```
 The frontend development server will be available at `http://localhost:5173`. It is configured to proxy `/api` requests to the backend running on `http://localhost:8001`.
+
+### Verification
+
+From the repository root, run `make console-test` to test the backend API,
+authentication boundary, and summary proxy without external credentials or services.
+Run `npm ci --prefix web-console/frontend` and
+`npm run build --prefix web-console/frontend` to verify the production frontend build.
+Ingest and Transform have separate suites: `make ingest-test` and `make transform-test`.
 
 ## Features
 - **Channel Selection**: Choose from active channels defined in `config.json`.
