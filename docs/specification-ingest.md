@@ -73,7 +73,7 @@ Reliably fill missing messages (gaps) and update existing ones (edits) by proces
     *   Updates the `last_backfilled_id` checkpoint **only after successful processing**.
 *   This ensures that even if Realtime mode is spotty, Backfill mode eventually ensures consistency up to the latest point.
 *   Uses **throttling** to avoid Telegram rate limits.
-* Throttling logic is reused from the existing PoC (`/poc` folder)
+* Messages are processed in batches of 100 with throttling between batches
 
 ### 3. Interval Mode
 
@@ -365,7 +365,7 @@ For each message, **all available Telegram data is stored**, including:
   * Backfill mode
   * Interval mode
 * Must be **batch-based**
-* Implementation should reuse logic from the existing PoC (`/poc`)
+* The shared `Throttler` controls delays between batches and limits requests per minute
 * Throttling parameters must be configurable
 
 

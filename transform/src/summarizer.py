@@ -107,7 +107,7 @@ class Summarizer:
         if message.get('url'):
             return message['url']
             
-        # Scan text for first http link (naive implementation similar to PoC)
+        # Scan text for the first HTTP link as a fallback.
         text = message.get('cleaned_text') or message.get('text', '')
         if not text:
             return 'нет ссылки'

@@ -1,8 +1,7 @@
 
 import asyncio
 import time
-import sys
-from datetime import datetime, timezone
+from datetime import timezone
 from typing import Dict, Any
 
 class Throttler:
@@ -33,11 +32,9 @@ class Throttler:
                 await asyncio.sleep(sleep_time)
             self.start_time = time.time()
 
-def serialize_message(message, user_cache=None) -> Dict[str, Any]:
+def serialize_message(message) -> Dict[str, Any]:
     """
-    Convert Telethon message to dict.
-    This is a simplified version of the one in poc/download_history.py,
-    tailored for what we actually need to store, but keeping it extensible.
+    Convert the Telegram message fields used by the application to a dictionary.
     """
     # Basic fields
     msg_date = message.date
@@ -59,13 +56,10 @@ def serialize_message(message, user_cache=None) -> Dict[str, Any]:
         "grouped_id": getattr(message, "grouped_id", None),
     }
 
-    # Sender info (simplified for now, complex logic in POC if needed)
+    # Sender info
     if message.sender:
          data["sender_id"] = message.sender_id
          if hasattr(message.sender, "username"):
              data["sender_username"] = message.sender.username
-    
-    # We can expand this with the full logic from POC if "all available metadata" 
-    # implies the deep structure present there.
     
     return data

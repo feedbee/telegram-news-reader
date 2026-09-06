@@ -50,8 +50,6 @@ firebase-service-account.json
 config.json
 data/
 session/
-poc/chroma_db/
-poc/output/
 
 # Testing
 .pytest_cache/
