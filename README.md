@@ -85,6 +85,10 @@ TELEGRAM_API_HASH=your_hash
 
 # Anthropic AI (Required for Transform)
 ANTHROPIC_API_KEY=sk-ant-xxx
+ANTHROPIC_TIMEOUT_SECONDS=110
+
+# Web Console proxy
+TRANSFORM_TIMEOUT_SECONDS=120
 
 # MongoDB (Default)
 MONGODB_URI=mongodb://admin:password@mongodb:27017/telegram-news-reader?authSource=admin

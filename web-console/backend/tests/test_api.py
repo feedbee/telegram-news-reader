@@ -69,6 +69,8 @@ def test_summary_proxy_preserves_body_and_updates_cursor(gateway):
     assert response.text == "# Summary"
     assert response.headers["X-META-LAST-MESSAGE-ID"] == "20"
     assert upstream.get.call_args.kwargs["params"]["last_message_id"] == "10"
+    factory.assert_called_once_with(timeout=main.TRANSFORM_TIMEOUT_SECONDS)
+    assert main.TRANSFORM_TIMEOUT_SECONDS == 120.0
     main.storage.update_user_metadata.assert_called_once_with("reader", "last_message_ids.@news", 20)
 
 

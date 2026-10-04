@@ -12,7 +12,10 @@ class Summarizer:
             logger.warning("ANTHROPIC_API_KEY is not set. Summarization will fail.")
             self.client = None
         else:
-            self.client = Anthropic(api_key=config.anthropic_api_key)
+            self.client = Anthropic(
+                api_key=config.anthropic_api_key,
+                timeout=config.anthropic_timeout_seconds,
+            )
 
     def summarize(self, messages: List[Dict[str, Any]], channel_id: Optional[str] = None) -> str:
         """

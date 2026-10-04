@@ -65,3 +65,4 @@ docker run --rm \
 Ensure your `.env` file contains:
 * `MONGODB_URI`
 * `ANTHROPIC_API_KEY`
+* `ANTHROPIC_TIMEOUT_SECONDS` (optional, defaults to `110`)

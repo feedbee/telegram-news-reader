@@ -6,7 +6,7 @@ The **Web Console** is a standalone, pull-based user interface for reading Teleg
 
 The component consists of two layers:
 1. **Frontend**: A React-based Single Page Application (SPA).
-2. **Backend**: A FastAPI-based proxy that handles API requests and serves static frontend assets. It includes a **60-second timeout** for proxying to allow the AI summarization to complete.
+2. **Backend**: A FastAPI-based proxy that handles API requests and serves static frontend assets. Its summary proxy timeout is configured with `TRANSFORM_TIMEOUT_SECONDS` and defaults to **120 seconds**.
 
 ## Running with Docker (Recommended)
 

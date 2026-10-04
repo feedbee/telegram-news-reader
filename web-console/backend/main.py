@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title="Web Console API Gateway")
 
 TRANSFORM_URL = os.getenv("TRANSFORM_URL", "http://transform:8000")
+TRANSFORM_TIMEOUT_SECONDS = float(os.getenv("TRANSFORM_TIMEOUT_SECONDS", "120"))
 CONFIG_PATH = os.getenv("CONFIG_PATH", "config.json")
 
 # Firebase Config (for frontend)
@@ -77,7 +78,7 @@ async def proxy_summarize(request: Request, user: dict = Depends(get_current_use
 
     url = f"{TRANSFORM_URL}/summarize"
     
-    async with httpx.AsyncClient(timeout=60.0) as client:
+    async with httpx.AsyncClient(timeout=TRANSFORM_TIMEOUT_SECONDS) as client:
         try:
             response = await client.get(url, params=paramsCopy)
             

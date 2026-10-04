@@ -15,6 +15,7 @@ class Config:
     anthropic_api_key: Optional[str] = os.getenv("ANTHROPIC_API_KEY")
     claude_model: str = os.getenv("CLAUDE_MODEL", "claude-sonnet-5")
     max_tokens: int = int(os.getenv("MAX_TOKENS", "4000"))
+    anthropic_timeout_seconds: float = float(os.getenv("ANTHROPIC_TIMEOUT_SECONDS", "110"))
     
     # Summarization Defaults
     max_messages_per_request: int = 100

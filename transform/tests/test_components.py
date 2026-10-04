@@ -12,6 +12,7 @@ def mock_config():
         mock_cfg.anthropic_api_key = "fake_key"
         mock_cfg.claude_model = "claude-fake"
         mock_cfg.max_tokens = 100
+        mock_cfg.anthropic_timeout_seconds = 110.0
         yield mock_cfg
 
 @pytest.fixture
@@ -25,6 +26,12 @@ def test_summarize_empty(mock_config, mock_anthropic):
     summarizer = Summarizer()
     result = summarizer.summarize([])
     assert result == "Nothing new"
+
+def test_anthropic_client_uses_configured_timeout(mock_config):
+    with patch('src.summarizer.Anthropic') as anthropic_constructor:
+        Summarizer()
+
+    anthropic_constructor.assert_called_once_with(api_key="fake_key", timeout=110.0)
 
 def test_summarize_success(mock_config, mock_anthropic):
     summarizer = Summarizer()
