@@ -45,7 +45,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH="/venv/bin:$PATH"
 
-RUN useradd -m -s /bin/bash appuser
+RUN groupadd --gid 1000 appuser \
+    && useradd --uid 1000 --gid 1000 --create-home --shell /bin/bash appuser
 
 COPY --from=builder /venv /venv
 COPY --chown=appuser:appuser . .

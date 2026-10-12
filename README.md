@@ -74,6 +74,14 @@ See [`docs/specification.md`](docs/specification.md) for detailed architecture.
 3. **Access the Console:**
    Open **http://localhost** in your browser.
 
+All three application images run as `appuser` with UID/GID `1000:1000`.
+Keep `config.json` mounted read-only for all services. On a Linux host,
+mounted files and their parent directories must allow this user to read the
+config and, for the web console, the Firebase service account file. Only
+ingest needs write access to the Telegram session directory (including
+SQLite journal files). Set permissions on these specific paths; do not make
+secrets world-readable or recursively change ownership of unrelated data.
+
 ## Environment Variables
 
 Create a `.env` file in the project root (see `.env.example` for a template):
