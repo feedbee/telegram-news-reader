@@ -3,6 +3,7 @@
         {
             "channel_id": "@example_channel",
             "name": "Example Channel",
+            "max_messages_per_request": 250,
             "is_active": true,
             "summarization_prompt": "Please summarize the following news in English. Key highlights first, then brief mentions of others. Use Markdown and include links if provided.\n\nNews:\n\n{news_text}"
         },

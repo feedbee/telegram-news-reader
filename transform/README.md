@@ -66,3 +66,28 @@ Ensure your `.env` file contains:
 * `MONGODB_URI`
 * `ANTHROPIC_API_KEY`
 * `ANTHROPIC_TIMEOUT_SECONDS` (optional, defaults to `110`)
+
+
+Per-channel (or chat) settings are read from `channels` in `CONFIG_PATH`
+(default: `config.json`). Match the `channel_id` used in the request:
+
+```json
+{
+  "channels": [
+    {
+      "channel_id": "@my_channel",
+      "max_messages_per_request": 250,
+      "summarization_prompt": "Summarize these messages: {news_text}"
+    }
+  ]
+}
+```
+
+`max_messages_per_request` overrides the Transform API and CLI selection limit.
+It must be a positive JSON integer; missing or invalid values use the code default
+of 100. This setting does not change Ingest throttling.
+
+A non-empty `summarization_prompt` replaces the built-in English summary prompt.
+Include `{news_text}` to insert the messages, formatted with date, text, and link.
+Without a custom prompt, the built-in prompt requests important events with links,
+brief mentions of other events, and Markdown formatting.

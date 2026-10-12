@@ -49,6 +49,7 @@ async def summarize(
 ):
     try:
         # Determine filters
+        message_limit = config.get_channel_message_limit(channel_id)
         messages = []
         msg_metadata = {"total": 0, "processed": 0}
         
@@ -57,7 +58,7 @@ async def summarize(
             messages = storage.get_messages_from_id(
                 channel_id, 
                 last_message_id, 
-                limit=config.max_messages_per_request
+                limit=message_limit
             )
         elif from_date:
             from_dt = parse_partial_datetime(from_date, is_end=False)
@@ -68,7 +69,7 @@ async def summarize(
                 channel_id, 
                 from_dt, 
                 to_dt, 
-                limit=config.max_messages_per_request
+                limit=message_limit
             )
         else:
             # Default: Last 24h
@@ -80,7 +81,7 @@ async def summarize(
                 channel_id, 
                 from_dt, 
                 to_dt, 
-                limit=config.max_messages_per_request
+                limit=message_limit
             )
 
         msg_metadata["total"] = total

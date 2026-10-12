@@ -100,6 +100,7 @@ class CLI:
 
     def handle_summarize(self, args):
         # Determine filters
+        message_limit = config.get_channel_message_limit(args.channel_id)
         messages = []
         msg_metadata = {"total": 0, "processed": 0}
         
@@ -109,7 +110,7 @@ class CLI:
             messages = self.storage.get_messages_from_id(
                 args.channel_id, 
                 args.last_message_id, 
-                limit=config.max_messages_per_request
+                limit=message_limit
             )
         elif args.from_date:
             # Based on Interval
@@ -121,7 +122,7 @@ class CLI:
                 args.channel_id, 
                 from_dt, 
                 to_dt, 
-                limit=config.max_messages_per_request
+                limit=message_limit
             )
         else:
             # Default behavior: Last 24 hours
@@ -133,7 +134,7 @@ class CLI:
                 args.channel_id, 
                 from_dt, 
                 to_dt, 
-                limit=config.max_messages_per_request
+                limit=message_limit
             )
         
         msg_metadata["total"] = total

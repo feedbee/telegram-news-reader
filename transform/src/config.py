@@ -23,12 +23,12 @@ class Config:
     # Config File
     config_path: str = os.getenv("CONFIG_PATH", "config.json")
     
-    def get_channel_prompt(self, channel_id: str) -> Optional[str]:
+    def _get_channel_config(self, channel_id: str) -> dict:
         """
-        Loads the config file and returns the summarization_prompt for the given channel_id.
+        Loads the config file and returns settings for the given channel_id.
         """
         if not os.path.exists(self.config_path):
-            return None
+            return {}
         
         try:
             import json
@@ -37,10 +37,19 @@ class Config:
                 channels = data.get("channels", [])
                 for ch in channels:
                     if ch.get("channel_id") == channel_id:
-                        return ch.get("summarization_prompt")
+                        return ch
         except Exception as e:
-            print(f"Error loading prompt from {self.config_path}: {e}")
+            print(f"Error loading channel config from {self.config_path}: {e}")
         
-        return None
+        return {}
+
+    def get_channel_prompt(self, channel_id: str) -> Optional[str]:
+        return self._get_channel_config(channel_id).get("summarization_prompt")
+
+    def get_channel_message_limit(self, channel_id: str) -> int:
+        limit = self._get_channel_config(channel_id).get("max_messages_per_request")
+        if type(limit) is int and limit > 0:
+            return limit
+        return self.max_messages_per_request
 
 config = Config()
